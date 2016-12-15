@@ -1,17 +1,22 @@
-var amqp          = require('amqplib'),
-    config        = require('config'),
-    TelegramBot   = require('node-telegram-bot-api'),
+var amqp             = require('amqplib'),
+    config           = require('config'),
+    TelegramBot      = require('node-telegram-bot-api'),
+    vsprintf         = require("sprintf-js").vsprintf,
     // Slack         = require('slack-node'),
-    tgtoken       = config.get('telegram.token'),
-    tgNotifyUsers = config.get('telegram.notifyUsers'),
+    tgtoken          = config.get('telegram.token'),
+    tgNotifyUsers    = config.get('telegram.notifyUsers'),
     // slackWebhooks = config.get('slack.webhooks'),
-    rabbitHost    = config.get('rabbitmq.host'),
-    rabbitUser    = config.get('rabbitmq.user'),
-    rabbitPass    = config.get('rabbitmq.pass'),
-    exchanges     = config.get('rabbitmq.exchanges')
+    rabbitHost       = config.get('rabbitmq.host'),
+    rabbitUser       = config.get('rabbitmq.user'),
+    rabbitPass       = config.get('rabbitmq.pass'),
+    exchanges        = config.get('rabbitmq.exchanges')
 ;
 
 var tgBot = new TelegramBot(tgtoken, { polling: true });
+
+/* tgBot.on("message", function(msg) {
+    console.log(msg);
+}); */
 
 var rabbitClient = {
     connect: function () {
@@ -40,9 +45,9 @@ var rabbitClient = {
                     });
 
                     function notify(msg) {
-                        // console.log(" [x] '%s'", msg.content.toString());
                         for (var i = 0; i < tgNotifyUsers.length; i++) {
-                            tgBot.sendMessage(tgNotifyUsers[i], "New event received %j", msg.content.toString());
+                            var message = vsprintf("New event received ```javascript %s ```", [msg.content.toString()]);
+                            tgBot.sendMessage(tgNotifyUsers[i], message, {"parse_mode": "Markdown"});
                         }
                     }
                 });
