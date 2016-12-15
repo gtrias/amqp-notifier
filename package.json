@@ -1,0 +1,16 @@
+{
+  "name": "amqp-notifier",
+  "version": "1.0.0",
+  "description": "Listen to amqp events and redirect messages to instant messaging system",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Genar <genar@acs.li>",
+  "license": "ISC",
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "config": "^1.24.0",
+    "node-telegram-bot-api": "^0.24.0"
+  }
+}

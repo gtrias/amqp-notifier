@@ -1,0 +1,20 @@
+{
+    "telegram": {
+        "token": "__TG_TOKEN_HERE__",
+        "notifyUsers": [
+        ]
+    },
+    "slack": {
+        "webhooks": [
+            "__WEBHOOK__"
+        ]
+    },
+    "rabbitmq": {
+        "host": "__RABBITMQ_HOST__",
+        "user": "__RABBITMQ_USER__",
+        "pass": "__RABBITMQ_PASS__",
+        "exchanges": [
+            "__RABBITMQ_EXCHANGE_TO_LISTEN__"
+        ]
+    }
+}
