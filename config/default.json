@@ -14,7 +14,13 @@
         "user": "__RABBITMQ_USER__",
         "pass": "__RABBITMQ_PASS__",
         "exchanges": [
-            "__RABBITMQ_EXCHANGE_TO_LISTEN__"
+            {
+                "name": "__RABBITMQ_EXCHANGE_TO_LISTEN__",
+                "message": "your exchange introduction message",
+                "fields": {
+                    "key1": "human text"
+                }
+            }
         ]
     }
 }

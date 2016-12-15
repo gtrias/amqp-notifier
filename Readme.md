@@ -20,3 +20,20 @@ docker run -e NODE_CONFIG='{}' -ti gtrias/amqp-notifier
 
 Check out `config/default.json` file to see all configurable fields
 
+
+Exchanges configuration example:
+
+```javascript
+        "exchanges": [
+            {
+                "name": "whatever.created",
+                "message": "your exchange introduction message",
+                "fields": [
+                    {
+                        "key": "test",
+                        "name": "Test"
+                    }
+                ]
+            }
+        ]
+```
