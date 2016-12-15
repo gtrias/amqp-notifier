@@ -41,8 +41,8 @@ var rabbitClient = {
 
                     function notify(msg) {
                         // console.log(" [x] '%s'", msg.content.toString());
-                        for (var i = 0; i < notifyUsers.length; i++) {
-                            tgBot.sendMessage(notifyUsers[i], "New event received %j", msg.content.toString());
+                        for (var i = 0; i < tgNotifyUsers.length; i++) {
+                            tgBot.sendMessage(tgNotifyUsers[i], "New event received %j", msg.content.toString());
                         }
                     }
                 });
