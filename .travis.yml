@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "6.2"
+
+sudo: required
+services:
+  - docker
+
+install:
+  - docker build -t gtrias/amqp-notifier .
+  - npm install
+
+script:
+  - docker run -d --name amqp-notifier gtrias/amqp-notifier
+  - docker ps | grep -q  amqp-notifier
+
+after_success:
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push gtrias/amqp-notifier;
+    fi
