@@ -1,6 +1,7 @@
 # amqp-notifier
 
-This bot will send messages to Telegram and Slack when a rabbitmq event is triggered
+This bot will send messages to Telegram and Slack when a rabbitmq event is triggered, it uses
+nunjucks template defined in exchange configuration to show a comprehensive message to the receiver.
 
 ## Installation
 
@@ -27,13 +28,7 @@ Exchanges configuration example:
         "exchanges": [
             {
                 "name": "whatever.created",
-                "message": "your exchange introduction message",
-                "fields": [
-                    {
-                        "key": "test",
-                        "name": "Test"
-                    }
-                ]
+                "template": "your exchange nunjucks template {{ some.amqp.msg.field }}"
             }
         ]
 ```

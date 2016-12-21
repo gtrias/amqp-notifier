@@ -1,7 +1,7 @@
 var amqp             = require('amqplib'),
+    nunjucks         = require('nunjucks'),
     config           = require('config'),
     TelegramBot      = require('node-telegram-bot-api'),
-    vsprintf         = require("sprintf-js").vsprintf,
     // Slack         = require('slack-node'),
     tgtoken          = config.get('telegram.token'),
     tgNotifyUsers    = config.get('telegram.notifyUsers'),
@@ -18,29 +18,19 @@ var tgBot = new TelegramBot(tgtoken, { polling: true });
     console.log(msg);
 }); */
 
-function notify(msg, exchangeMessage, exchangeFields) {
+function notify(msg, template) {
     var payload = {};
     var object = JSON.parse(msg.content.toString());
-
-    for ( var prop in object) {
-        for (var i = 0; i < exchangeFields.length; i++) {
-            if (prop == exchangeFields[i].key) {
-                payload[prop] = object[prop];
-            }
-        }
-    }
-
+    var res = nunjucks.renderString(template, object);
     for (var i = 0; i < tgNotifyUsers.length; i++) {
-        tgBot.sendMessage(tgNotifyUsers[i], exchangeMessage);
-        tgBot.sendMessage(tgNotifyUsers[i], '```javascript ' + JSON.stringify(payload) + ' ```', {"parse_mode": "Markdown"});
+        tgBot.sendMessage(tgNotifyUsers[i], res);
     }
 }
 
 
 function openExchange(conn, exchange) {
     var exchangeName = exchange.name;
-    var exchangeMessage = exchange.message;
-    var exchangeFields = exchange.fields;
+    var exchangeTemplate = exchange.template;
 
     conn.createChannel().then(function(ch) {
         var ok = ch.assertExchange(exchangeName, 'fanout', {durable: true});
@@ -54,7 +44,7 @@ function openExchange(conn, exchange) {
         });
         ok = ok.then(function(queue) {
             return ch.consume(queue, function (msg) {
-                notify(msg, exchangeMessage, exchangeFields);
+                notify(msg, exchangeTemplate);
             }, {noAck: true});
         });
 

@@ -12,6 +12,6 @@
     "amqplib": "^0.5.1",
     "config": "^1.24.0",
     "node-telegram-bot-api": "^0.24.0",
-    "sprintf-js": "^1.0.3"
+    "nunjucks": "^3.0.0"
   }
 }
