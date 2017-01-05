@@ -12,6 +12,8 @@
     "amqplib": "^0.5.1",
     "config": "^1.24.0",
     "node-telegram-bot-api": "^0.24.0",
-    "nunjucks": "^3.0.0"
+    "nunjucks": "^3.0.0",
+    "slack": "^8.1.2",
+    "slack-node": "^0.1.8"
   }
 }

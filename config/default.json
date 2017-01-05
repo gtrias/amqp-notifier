@@ -5,8 +5,12 @@
         ]
     },
     "slack": {
-        "webhooks": [
-            "__WEBHOOK__"
+        "url": "http://your-slack-url.com",
+        "tokens": [
+            {
+                "token": "TOKEN",
+                "channel": "#general"
+            }
         ]
     },
     "rabbitmq": {

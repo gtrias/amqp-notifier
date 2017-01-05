@@ -1,16 +1,16 @@
-var amqp             = require('amqplib'),
-    nunjucks         = require('nunjucks'),
-    config           = require('config'),
-    TelegramBot      = require('node-telegram-bot-api'),
-    // Slack         = require('slack-node'),
-    tgtoken          = config.get('telegram.token'),
-    tgNotifyUsers    = config.get('telegram.notifyUsers'),
-    // slackWebhooks = config.get('slack.webhooks'),
-    rabbitHost       = config.get('rabbitmq.host'),
-    rabbitUser       = config.get('rabbitmq.user'),
-    rabbitPass       = config.get('rabbitmq.pass'),
-    exchanges        = config.get('rabbitmq.exchanges')
-;
+var amqp          = require('amqplib');
+var nunjucks      = require('nunjucks');
+var config        = require('config');
+var TelegramBot   = require('node-telegram-bot-api');
+var Slack         = require('slack-node');
+var tgtoken       = config.get('telegram.token');
+var tgNotifyUsers = config.get('telegram.notifyUsers');
+var slackWebhooks = config.get('slack.tokens');
+var slackUrl      = config.get('slack.url');
+var rabbitHost    = config.get('rabbitmq.host');
+var rabbitUser    = config.get('rabbitmq.user');
+var rabbitPass    = config.get('rabbitmq.pass');
+var exchanges     = config.get('rabbitmq.exchanges');
 
 var tgBot = new TelegramBot(tgtoken, { polling: true });
 
@@ -22,11 +22,40 @@ function notify(msg, template) {
     var payload = {};
     var object = JSON.parse(msg.content.toString());
     var res = nunjucks.renderString(template, object);
+
+    // Telegram sending
     for (var i = 0; i < tgNotifyUsers.length; i++) {
         tgBot.sendMessage(tgNotifyUsers[i], res);
     }
+
+    // Slack sending
+    for (token in slackTokens) {
+        var apiToken = token.token;
+        var SlackClient = new Slack(apiToken);
+        SlackClient.url = slackUrl;
+
+        SlackClient.api('chat.postMessage', {
+          text: res,
+          channel: token.channel
+        }, function(err, response){
+          console.log(response);
+        });
+    }
 }
 
+var rabbitClient = {
+    connect: function () {
+        console.log('[amqp-notifier] Starting rabbitmq worker in server %s', rabbitHost);
+        amqp.connect('amqp://' + rabbitUser + ':' + rabbitPass + '@' + rabbitHost).then(function(conn) {
+            process.once('SIGINT', function() { conn.close(); });
+
+            for (var i = 0; i < exchanges.length; i++) {
+                openExchange(conn, exchanges[i]);
+            }
+
+        }).catch(console.warn);
+    }
+};
 
 function openExchange(conn, exchange) {
     var exchangeName = exchange.name;
@@ -55,18 +84,5 @@ function openExchange(conn, exchange) {
     });
 }
 
-var rabbitClient = {
-    connect: function () {
-        console.log('[amqp-notifier] Starting rabbitmq worker in server %s', rabbitHost);
-        amqp.connect('amqp://' + rabbitUser + ':' + rabbitPass + '@' + rabbitHost).then(function(conn) {
-            process.once('SIGINT', function() { conn.close(); });
-
-            for (var i = 0; i < exchanges.length; i++) {
-                openExchange(conn, exchanges[i]);
-            }
-
-        }).catch(console.warn);
-    }
-};
-
+// Start our worker
 rabbitClient.connect();
