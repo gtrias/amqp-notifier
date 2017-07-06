@@ -4,6 +4,7 @@
   "description": "Listen to amqp events and redirect messages to instant messaging system",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Genar <genar@acs.li>",
