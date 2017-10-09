@@ -58,32 +58,34 @@ var rabbitClient = {
 };
 
 function openExchange(conn, exchange) {
-    var exchangeName = exchange.name;
-    var exchangeTemplate = exchange.template;
+    var exchangeName = exchange.name
+    var exchangeTemplate = exchange.template
     var exchangeType = exchange.type || 'fanout'
     var routeKey = exchange.routeKey || ''
     var queueName = exchange.queueName || ''
 
     conn.createChannel().then(function(ch) {
-        var ok = ch.assertExchange(exchangeName, exchangeType, {durable: true});
+        var ok = ch.assertExchange(exchangeName, exchangeType, {durable: true})
         ok = ok.then(function() {
-            return ch.assertQueue(queueName, {exclusive: true});
-        });
+            return ch.assertQueue(queueName, {exclusive: true})
+        })
         ok = ok.then(function(qok) {
             return ch.bindQueue(qok.queue, exchangeName, routeKey).then(function() {
-                return qok.queue;
+                return qok.queue
             });
         });
         ok = ok.then(function(queue) {
             return ch.consume(queue, function (msg) {
-                notify(msg, exchangeTemplate);
-            }, {noAck: true});
+                if (config.get('debug')) {
+                    console.log(msg.content.toString())
+                }
+                notify(msg, exchangeTemplate)
+            }, {noAck: true})
         });
 
         return ok.then(function() {
-            console.log('[amqp-notifier] [*] Waiting for events on %s', exchangeName);
+            console.log('[amqp-notifier] [*] Waiting for events on %s', exchangeName)
         });
-
     });
 }
 
