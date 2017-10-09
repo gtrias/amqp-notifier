@@ -60,14 +60,17 @@ var rabbitClient = {
 function openExchange(conn, exchange) {
     var exchangeName = exchange.name;
     var exchangeTemplate = exchange.template;
+    var exchangeType = exchange.type || 'fanout'
+    var routeKey = exchange.routeKey || ''
+    var queueName = exchange.queueName || ''
 
     conn.createChannel().then(function(ch) {
-        var ok = ch.assertExchange(exchangeName, 'fanout', {durable: true});
+        var ok = ch.assertExchange(exchangeName, exchangeType, {durable: true});
         ok = ok.then(function() {
-            return ch.assertQueue('', {exclusive: true});
+            return ch.assertQueue(queueName, {exclusive: true});
         });
         ok = ok.then(function(qok) {
-            return ch.bindQueue(qok.queue, exchangeName, '').then(function() {
+            return ch.bindQueue(qok.queue, exchangeName, routeKey).then(function() {
                 return qok.queue;
             });
         });
